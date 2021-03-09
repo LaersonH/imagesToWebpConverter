@@ -1,9 +1,17 @@
+import concurrent.futures
 from PIL import Image
-from matplotlib import image
 import os
 
-pack = list(os.scandir('before\\'))
 
-for num in range(len(pack)):
-    img = Image.open('before\\' + pack[num].name)
-    img.save('afther\\' + pack[num].name + '.webp', format="WEBP")
+def process_image(image):
+    img = Image.open(f"before\\{str(image)}")
+    image = image.split(".")
+    img.save(f"afther\\{str(image[0])}.webp", format="WEBP")
+
+
+if __name__ == '__main__':
+    images = []
+    for _, _, filenames in os.walk("before\\"):
+        images = filenames
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        executor.map(process_image, images)
